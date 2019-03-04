@@ -125,17 +125,12 @@ int main() {
 
     struct tile tiles[size][size];
 
-    int total = 0;
-    int grass = 0;
-    int water = 0;
-
     for (i = 0; i < size; ++i) {
         for (j = 0; j < size; ++j) {
             if (nodes[i][j].vert.Y > 0.0f || nodes[i + 1][j].vert.Y > 0.0f || nodes[i][j + 1].vert.Y > 0.0f || nodes[i + 1][j + 1].vert.Y > 0.0f) {
                 tiles[i][j].color = irr::video::SColor(255, 0, 255, 0);
                 irr::f32 Y = (nodes[i][j].vert.Y + nodes[i + 1][j].vert.Y + nodes[i][j + 1].vert.Y +  nodes[i + 1][j + 1].vert.Y) / 4.0f;
                 tiles[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f + 0.5f, Y, (float)j - (float)size / 2.0f + 0.5f);
-                ++grass;
             } else {
                 tiles[i][j].color = irr::video::SColor(255, 0, 0, 255);
                 nodes[i][j].vert.Y = 0.0f;
@@ -143,13 +138,9 @@ int main() {
                 nodes[i][j + 1].vert.Y = 0.0f;
                 nodes[i + 1][j + 1].vert.Y = 0.0f;
                 tiles[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f + 0.5f, 0.0f, (float)j - (float)size / 2.0f + 0.5f);
-                ++water;
             }
-            ++total;
         }
     }
-
-    printf("%d %d %d\n", total, water, grass);
 
     irr::f32 gap = 0.1f;
 
