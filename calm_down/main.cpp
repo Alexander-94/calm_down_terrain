@@ -2,6 +2,8 @@
 #include <S3DVertex.h>
 #include <cmath>
 #include <random>
+#include <vector>
+#include <algorithm>
 
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
@@ -28,7 +30,8 @@ int main() {
 
     int size = 64;
     std::default_random_engine g;
-    std::uniform_real_distribution<float> d(0.0f, 1.0f);
+    g.seed(std::random_device()());
+    std::uniform_real_distribution<float> d(-16.0f, 16.0f);
 
     irr::IrrlichtDevice *device = irr::createDevice(irr::video::EDT_OPENGL, irr::core::dimension2d<irr::u32>(1280, 720), 32, false, false, false, NULL);
     if (!device) {
@@ -52,43 +55,71 @@ int main() {
 
     int i;
     int j;
+    int k;
 
     for (i = 0; i < size + 1; ++i) {
         for (j = 0; j < size + 1; ++j) {
-            nodes[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f, d(g) - 0.708f, (float)j - (float)size / 2.0f);
+            nodes[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f, d(g), (float)j - (float)size / 2.0f);
         }
     }
 
-    irr::f32 temp[size + 1][size + 1];
-    int smooth = 1;
-    if (smooth) {
-        for (i = 0; i < size + 1; ++i) {
-            for (j = 0; j < size + 1; ++j) {
+    int smooth = size / 4;
+    for (i = 0; i < smooth; ++i) {
+        irr::f32 temp[size + 1][size + 1];
+        for (j = 0; j < size + 1; ++j) {
+            for (k = 0; k < size + 1; ++k) {
                 int avg = 1;
-                temp[i][j] = nodes[i][j].vert.Y;
-                if (i > 0) {
-                    temp[i][j] = temp[i][j] + nodes[i - 1][j].vert.Y;
-                    ++avg;
-                }
+                temp[j][k] = nodes[j][k].vert.Y;
                 if (j > 0) {
-                    temp[i][j] = temp[i][j] + nodes[i][j - 1].vert.Y;
+                    temp[j][k] = temp[j][k] + nodes[j - 1][k].vert.Y;
                     ++avg;
                 }
-                if (i < size) {
-                    temp[i][j] = temp[i][j] + nodes[i + 1][j].vert.Y;
+                if (k > 0) {
+                    temp[j][k] = temp[j][k] + nodes[j][k - 1].vert.Y;
                     ++avg;
                 }
                 if (j < size) {
-                    temp[i][j] = temp[i][j] + nodes[i][j + 1].vert.Y;
+                    temp[j][k] = temp[j][k] + nodes[j + 1][k].vert.Y;
                     ++avg;
                 }
-                temp[i][j] = temp[i][j] / (float)avg;
+                if (k < size) {
+                    temp[j][k] = temp[j][k] + nodes[j][k + 1].vert.Y;
+                   ++avg;
+                }
+                temp[j][k] = temp[j][k] / (float)avg;
             }
         }
-        for (i = 0; i < size + 1; ++i) {
-            for (j = 0; j < size + 1; ++j) {
-                nodes[i][j].vert.Y = temp[i][j];
+        for (j = 0; j < size + 1; ++j) {
+            for (k = 0; k < size + 1; ++k) {
+                nodes[j][k].vert.Y = temp[j][k];
             }
+        }
+    }
+
+    std::vector<float> distrib(size * size);
+
+    for (i = 0; i < size; ++i) {
+        for (j = 0; j < size; ++j) {
+            distrib[i * size + j] = nodes[i][j].vert.Y;
+            if (distrib[i * size + j] < nodes[i + 1][j].vert.Y) {
+                distrib[i * size + j] = nodes[i + 1][j].vert.Y;
+            }
+            if (distrib[i * size + j] < nodes[i][j + 1].vert.Y) {
+                distrib[i * size + j] = nodes[i][j + 1].vert.Y;
+            }
+            if (distrib[i * size + j] < nodes[i + 1][j + 1].vert.Y) {
+                distrib[i * size + j] = nodes[i + 1][j + 1].vert.Y;
+            }
+        }
+    }
+
+    std::sort(distrib.begin(), distrib.end());
+
+    float coeff = distrib[size * size * 0.708f];
+
+    for (i = 0; i < size + 1; ++i) {
+        for (j = 0; j < size + 1; ++j) {
+            nodes[i][j].vert.Y = nodes[i][j].vert.Y - coeff;
         }
     }
 
@@ -107,10 +138,10 @@ int main() {
                 ++grass;
             } else {
                 tiles[i][j].color = irr::video::SColor(255, 0, 0, 255);
-                temp[i][j] = 0.0f;
-                temp[i + 1][j] = 0.0f;
-                temp[i][j + 1] = 0.0f;
-                temp[i + 1][j + 1] = 0.0f;
+                nodes[i][j].vert.Y = 0.0f;
+                nodes[i + 1][j].vert.Y = 0.0f;
+                nodes[i][j + 1].vert.Y = 0.0f;
+                nodes[i + 1][j + 1].vert.Y = 0.0f;
                 tiles[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f + 0.5f, 0.0f, (float)j - (float)size / 2.0f + 0.5f);
                 ++water;
             }
