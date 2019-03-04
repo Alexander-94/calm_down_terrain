@@ -1,5 +1,5 @@
 # calm_down_terrain
-Researching the c++ irrlicht 3d engine - building the terrain
+Researching the c++ irrlicht 3d engine - building the terrain with SMesh and SMeshBuffer
 
 Setup:  
 In the Visual Studio  
