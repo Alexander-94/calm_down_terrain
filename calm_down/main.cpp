@@ -1,200 +1,195 @@
+/** Example 010 Shaders
+
+This tutorial shows how to use shaders for D3D8, D3D9, OpenGL, and Cg with the
+engine and how to create new material types with them. It also shows how to
+disable the generation of mipmaps at texture loading, and how to use text scene
+nodes.
+
+This tutorial does not explain how shaders work. I would recommend to read the
+D3D, OpenGL, or Cg documentation, to search a tutorial, or to read a book about
+this.
+
+At first, we need to include all headers and do the stuff we always do, like in
+nearly all other tutorials:
+*/
 #include <irrlicht.h>
-#include <S3DVertex.h>
-#include <cmath>
-#include <random>
-#include <vector>
-#include <algorithm>
+#include <iostream>
+#include "driverChoice.h"
+
+using namespace irr;
 
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
-irr::core::vector3df vector_combine(irr::core::vector3df v1, irr::core::vector3df v2, float f1, float f2) {
-    irr::core::vector3df result;
-    result.X = f1 * v1.X + f2 * v2.X;
-    result.Y = f1 * v1.Y + f2 * v2.Y;
-    result.Z = f1 * v1.Z + f2 * v2.Z;
-    return result;
-}
+/*
+Because we want to use some interesting shaders in this tutorials, we need to
+set some data for them to make them able to compute nice colors. In this
+example, we'll use a simple vertex shader which will calculate the color of the
+vertex based on the position of the camera.
+For this, the shader needs the following data: The inverted world matrix for
+transforming the normal, the clip matrix for transforming the position, the
+camera position and the world position of the object for the calculation of the
+angle of light, and the color of the light. To be able to tell the shader all
+this data every frame, we have to derive a class from the
+IShaderConstantSetCallBack interface and override its only method, namely
+OnSetConstants(). This method will be called every time the material is set.
+The method setVertexShaderConstant() of the IMaterialRendererServices interface
+is used to set the data the shader needs. If the user chose to use a High Level
+shader language like HLSL instead of Assembler in this example, you have to set
+the variable name as parameter instead of the register index.
+*/
 
-struct node {
-    irr::core::vector3df vert;
+using namespace irr;
+using namespace core;
+using namespace scene;
+using namespace video;
+using namespace io;
+using namespace gui;
+using namespace std;
+
+#define SPEED 10
+extern bool fullscreen = false;
+
+IrrlichtDevice*  device = 0;  // окно которое выдает движок для работы с трехмерным миром
+IVideoDriver*    driver;      // то через что выводится вся графика
+ISceneManager*   smgr;        // менеджер сцены - через него делается почти вся работа над объектами
+IGUIEnvironment* guienv;      // графический интерфейс
+
+class MyEventReceiver : public IEventReceiver
+{
+public:
+	// This is the one method that we have to implement
+	virtual bool OnEvent(const SEvent& event)
+	{
+		// Remember whether each key is down or up
+		if (event.EventType == irr::EET_KEY_INPUT_EVENT)
+			KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
+
+		//??? irr::EMIE_MOUSE_WHEEL
+		return false;
+	}
+
+	// This is used to check whether a key is being held down
+	virtual bool IsKeyDown(EKEY_CODE keyCode) const
+	{
+		return KeyIsDown[keyCode];
+	}
+
+	MyEventReceiver()
+	{
+		for (u32 i = 0; i<KEY_KEY_CODES_COUNT; ++i)
+			KeyIsDown[i] = false;
+	}
+
+private:
+	// We use this array to store the current state of each key
+	bool KeyIsDown[KEY_KEY_CODES_COUNT];
 };
 
-struct tile {
-    irr::core::vector3df vert;
-    irr::video::SColor color;
-};
+irr::f32 mouseWheel;
 
-int main() {
+int main()
+{
+	//The event receiver for keeping the pressed keys is ready, the actual responses will be made inside the render loop, right before drawing the scene.
+	MyEventReceiver receiver;
+	//the root object for doing anything with the engine
+	device = createDevice(video::EDT_OPENGL, dimension2d<u32>(1080, 720), 32, fullscreen, true, true, &receiver);
+	if (!device)
+		return 1;
+	device->setWindowCaption(L"Hello World! - Irrlicht CALM DOWN Demo");
+	driver = device->getVideoDriver();
+	smgr = device->getSceneManager();
+	guienv = device->getGUIEnvironment();
+	guienv->addStaticText(L"Q - Up, E - Down, WASD - movement, ESC - exit", rect<s32>(10, 10, 260, 22), true);
 
-    int size = 64;
-    std::default_random_engine g;
-    g.seed(std::random_device()());
-    std::uniform_real_distribution<float> d(-16.0f, 16.0f);
+	SKeyMap keyMap[8];
+	keyMap[0].Action = EKA_MOVE_FORWARD;
+	keyMap[0].KeyCode = KEY_UP;
+	keyMap[1].Action = EKA_MOVE_BACKWARD;
+	keyMap[1].KeyCode = KEY_DOWN;
+	keyMap[2].Action = EKA_STRAFE_LEFT;
+	keyMap[2].KeyCode = KEY_LEFT;
+	keyMap[3].Action = EKA_STRAFE_RIGHT;
+	keyMap[3].KeyCode = KEY_RIGHT;
+	keyMap[4].Action = EKA_MOVE_FORWARD;
+	keyMap[4].KeyCode = KEY_KEY_W;
+	keyMap[5].Action = EKA_MOVE_BACKWARD;
+	keyMap[5].KeyCode = KEY_KEY_S;
+	keyMap[6].Action = EKA_STRAFE_LEFT;
+	keyMap[6].KeyCode = KEY_KEY_A;
+	keyMap[7].Action = EKA_STRAFE_RIGHT;
+	keyMap[7].KeyCode = KEY_KEY_D;
 
-    irr::IrrlichtDevice *device = irr::createDevice(irr::video::EDT_OPENGL, irr::core::dimension2d<irr::u32>(1280, 720), 32, false, false, false, NULL);
-    if (!device) {
-        return 1;
-    }
+	ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0, 75, 1, -1, keyMap, 8);
+	camera->setPosition(vector3df(1500));
 
-    irr::video::IVideoDriver *driver = device->getVideoDriver();
-    irr::scene::ISceneManager *manager = device->getSceneManager();
 
-    irr::scene::ICameraSceneNode *camera = manager->addCameraSceneNodeFPS();
-    camera->setPosition(irr::core::vector3df(0.0f, (float)size / 2.0f, (float)size / 1.5f));
-    camera->setTarget(irr::core::vector3df(0.0f, 0.0f, 0.0f));
+	int side_size = 10000;
+	int pol_width = 200;
+	int size = side_size / pol_width;
+	int vertexes = 12;
 
-    irr::scene::SMesh *mesh = new irr::scene::SMesh();
-    irr::scene::SMeshBuffer *buffer = new irr::scene::SMeshBuffer();
+	SMesh* mesh = new SMesh();
+	SMeshBuffer *mesh_buffer = new SMeshBuffer();
+	mesh->addMeshBuffer(mesh_buffer);
+	mesh_buffer->drop();
 
-    mesh->addMeshBuffer(buffer);
-    buffer->drop();
+	mesh_buffer->Vertices.reallocate(size*size*vertexes); //allocate space for vertices
+	mesh_buffer->Vertices.set_used(size*size*vertexes);   //now you can access indices 0..20*20*6
 
-    struct node nodes[size + 1][size + 1];
+	int vert_count = 0;
+	float delta = 3;
+	for (int x = 0; x < size; x++) {//size		
+		for (int y = 0; y < size; y++) {//size
+			mesh_buffer->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-    int i;
-    int j;
-    int k;
+			mesh_buffer->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-    for (i = 0; i < size + 1; ++i) {
-        for (j = 0; j < size + 1; ++j) {
-            nodes[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f, d(g), (float)j - (float)size / 2.0f);
-        }
-    }
+			mesh_buffer->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-    int smooth = size / 4;
-    for (i = 0; i < smooth; ++i) {
-        irr::f32 temp[size + 1][size + 1];
-        for (j = 0; j < size + 1; ++j) {
-            for (k = 0; k < size + 1; ++k) {
-                int avg = 1;
-                temp[j][k] = nodes[j][k].vert.Y;
-                if (j > 0) {
-                    temp[j][k] = temp[j][k] + nodes[j - 1][k].vert.Y;
-                    ++avg;
-                }
-                if (k > 0) {
-                    temp[j][k] = temp[j][k] + nodes[j][k - 1].vert.Y;
-                    ++avg;
-                }
-                if (j < size) {
-                    temp[j][k] = temp[j][k] + nodes[j + 1][k].vert.Y;
-                    ++avg;
-                }
-                if (k < size) {
-                    temp[j][k] = temp[j][k] + nodes[j][k + 1].vert.Y;
-                   ++avg;
-                }
-                temp[j][k] = temp[j][k] / (float)avg;
-            }
-        }
-        for (j = 0; j < size + 1; ++j) {
-            for (k = 0; k < size + 1; ++k) {
-                nodes[j][k].vert.Y = temp[j][k];
-            }
-        }
-    }
+			mesh_buffer->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-    std::vector<float> distrib(size * size);
+			vert_count += 12;
+		}
+	}
 
-    for (i = 0; i < size; ++i) {
-        for (j = 0; j < size; ++j) {
-            distrib[i * size + j] = nodes[i][j].vert.Y;
-            if (distrib[i * size + j] < nodes[i + 1][j].vert.Y) {
-                distrib[i * size + j] = nodes[i + 1][j].vert.Y;
-            }
-            if (distrib[i * size + j] < nodes[i][j + 1].vert.Y) {
-                distrib[i * size + j] = nodes[i][j + 1].vert.Y;
-            }
-            if (distrib[i * size + j] < nodes[i + 1][j + 1].vert.Y) {
-                distrib[i * size + j] = nodes[i + 1][j + 1].vert.Y;
-            }
-        }
-    }
+	mesh_buffer->Indices.reallocate(size*size*vertexes);  //allocate space for indices
+	mesh_buffer->Indices.set_used(size*size*vertexes);
+	for (int i = 0; i < size * size * vertexes; ++i) {
+		mesh_buffer->Indices[i] = i;
+	}
 
-    std::sort(distrib.begin(), distrib.end());
+	mesh_buffer->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	IMeshSceneNode* myNode = smgr->addMeshSceneNode(mesh);
+	myNode->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode->setMaterialFlag(EMF_LIGHTING, false);
+	//myNode->setMaterialFlag(video::EMF_WIREFRAME, true);
+	myNode->setPosition(vector3df(0, 0, 0));
 
-    float coeff = distrib[size * size * 0.708f];
-
-    for (i = 0; i < size + 1; ++i) {
-        for (j = 0; j < size + 1; ++j) {
-            nodes[i][j].vert.Y = nodes[i][j].vert.Y - coeff;
-        }
-    }
-
-    struct tile tiles[size][size];
-
-    for (i = 0; i < size; ++i) {
-        for (j = 0; j < size; ++j) {
-            if (nodes[i][j].vert.Y > 0.0f || nodes[i + 1][j].vert.Y > 0.0f || nodes[i][j + 1].vert.Y > 0.0f || nodes[i + 1][j + 1].vert.Y > 0.0f) {
-                tiles[i][j].color = irr::video::SColor(255, 0, 255, 0);
-                irr::f32 Y = (nodes[i][j].vert.Y + nodes[i + 1][j].vert.Y + nodes[i][j + 1].vert.Y +  nodes[i + 1][j + 1].vert.Y) / 4.0f;
-                tiles[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f + 0.5f, Y, (float)j - (float)size / 2.0f + 0.5f);
-            } else {
-                tiles[i][j].color = irr::video::SColor(255, 0, 0, 255);
-                nodes[i][j].vert.Y = 0.0f;
-                nodes[i + 1][j].vert.Y = 0.0f;
-                nodes[i][j + 1].vert.Y = 0.0f;
-                nodes[i + 1][j + 1].vert.Y = 0.0f;
-                tiles[i][j].vert = irr::core::vector3df((float)i - (float)size / 2.0f + 0.5f, 0.0f, (float)j - (float)size / 2.0f + 0.5f);
-            }
-        }
-    }
-
-    irr::f32 gap = 0.1f;
-
-    buffer->Vertices.reallocate(size * size * 12);
-    buffer->Vertices.set_used(size * size * 12);
-    for (i = 0; i < size; ++i) {
-        for (j = 0; j < size; ++j) {
-
-            buffer->Vertices[(i * size + j) * 12 + 0] = irr::video::S3DVertex(tiles[i][j].vert, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            irr::core::vector3df temp = vector_combine(tiles[i][j].vert, nodes[i][j].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 1] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i][j + 1].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 2] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-
-            buffer->Vertices[(i * size + j) * 12 + 3] = irr::video::S3DVertex(tiles[i][j].vert, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i][j + 1].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 4] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i + 1][j + 1].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 5] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-
-            buffer->Vertices[(i * size + j) * 12 + 6] = irr::video::S3DVertex(tiles[i][j].vert, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i + 1][j + 1].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 7] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i + 1][j].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 8] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-
-            buffer->Vertices[(i * size + j) * 12 + 9] = irr::video::S3DVertex(tiles[i][j].vert, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i + 1][j].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 10] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-            temp = vector_combine(tiles[i][j].vert, nodes[i][j].vert, gap, 1.0f - gap);
-            buffer->Vertices[(i * size + j) * 12 + 11] = irr::video::S3DVertex(temp, irr::core::vector3df(0.0f, 1.0f, 0.0f), tiles[i][j].color, irr::core::vector2df(0, 0));
-        }
-    }
-
-    buffer->Indices.reallocate(size * size * 12);
-    buffer->Indices.set_used(size * size * 12);
-    for (i = 0; i < size * size * 12; ++i) {
-        buffer->Indices[i] = i;
-    }
-
-    buffer->recalculateBoundingBox();
-
-    irr::scene::IMeshSceneNode *node = manager->addMeshSceneNode(mesh);
-
-    node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
-
-    while (device->run()) {
-        driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
-        manager->drawAll();
-        driver->endScene();
-    }
-
-    device->drop();
-
-    return EXIT_SUCCESS;
-
+	//The game cycle:
+	//We run the device in a while() loop, until the device does not want to run any more. 
+	//This would be when the user closes the window
+	while (device->run())
+	{
+		if (receiver.IsKeyDown(irr::KEY_ESCAPE))
+		{
+			device->drop();
+			exit(0);
+		}
+		driver->beginScene(true, true, SColor(255, 157, 212, 140));
+		smgr->drawAll();
+		guienv->drawAll();
+		driver->endScene();
+	}
+	device->drop();
+	return 0;
 }
