@@ -88,13 +88,17 @@ private:
 };
 
 irr::f32 mouseWheel;
+irr::s32 framelimit = 60,
+		 now = 0;
+irr::u32 sceneStartTime = 0,
+		 sceneSkipTime = 1000 / framelimit;
 
 int main()
 {
 	//The event receiver for keeping the pressed keys is ready, the actual responses will be made inside the render loop, right before drawing the scene.
 	MyEventReceiver receiver;
 	//the root object for doing anything with the engine
-	device = createDevice(video::EDT_OPENGL, dimension2d<u32>(1080, 720), 32, fullscreen, true, true, &receiver);
+	device = createDevice(irr::video::EDT_OPENGL, irr::core::dimension2d<u32>(1080, 720), 32, false, false, false, &receiver);
 	if (!device)
 		return 1;
 	device->setWindowCaption(L"Hello World! - Irrlicht CALM DOWN Demo");
@@ -121,11 +125,7 @@ int main()
 	keyMap[7].Action = EKA_STRAFE_RIGHT;
 	keyMap[7].KeyCode = KEY_KEY_D;
 
-	ICameraSceneNode* camera = smgr->addCameraSceneNodeFPS(0, 75, 1, -1, keyMap, 8);
-	camera->setPosition(vector3df(1500));
-
-
-	int side_size = 10000;
+	int side_size = 1000;//0;
 	int pol_width = 200;
 	int size = side_size / pol_width;
 	int vertexes = 12;
@@ -139,7 +139,7 @@ int main()
 	mesh_buffer->Vertices.set_used(size*size*vertexes);   //now you can access indices 0..20*20*6
 
 	int vert_count = 0;
-	float delta = 3;
+	float delta = 10;
 	for (int x = 0; x < size; x++) {//size		
 		for (int y = 0; y < size; y++) {//size
 			mesh_buffer->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
@@ -175,21 +175,42 @@ int main()
 	//myNode->setMaterialFlag(video::EMF_WIREFRAME, true);
 	myNode->setPosition(vector3df(0, 0, 0));
 
+
+	ICameraSceneNode* camera = 0;
+	//camera = smgr->addCameraSceneNodeFPS(0, 75.0f, 1.0f, -1, keyMap, 8);
+	camera = smgr->addCameraSceneNodeFPS();
+	camera->setPosition(vector3df(500.0f, 200.0f, 500.0f));
+	//camera->setTarget(vector3df(0.0f, 0.0f, 100.0f));
+	camera->setFarValue(20000.f);//20000
+	camera->setNearValue(1.0f);
+	//
+
+	
+	
+	irr::f32 a = camera->getFOV();
+	printf("\n--%f--\n", a); //1.2566
+
 	//The game cycle:
 	//We run the device in a while() loop, until the device does not want to run any more. 
 	//This would be when the user closes the window
 	while (device->run())
 	{
-		if (receiver.IsKeyDown(irr::KEY_ESCAPE))
+		now = device->getTimer()->getTime();      //set current time to var
+		if (now - sceneStartTime > sceneSkipTime)
 		{
-			device->drop();
-			exit(0);
+			sceneStartTime = device->getTimer()->getTime();
+			if (receiver.IsKeyDown(irr::KEY_ESCAPE))
+			{
+				device->drop();
+				exit(0);
+			}
+			driver->beginScene(true, true, SColor(255, 157, 212, 140));
+			smgr->drawAll();
+//			guienv->drawAll();
+			driver->endScene();
 		}
-		driver->beginScene(true, true, SColor(255, 157, 212, 140));
-		smgr->drawAll();
-		guienv->drawAll();
-		driver->endScene();
 	}
+	device->closeDevice();
 	device->drop();
 	return 0;
 }
