@@ -1,11 +1,43 @@
 ﻿  main.cpp
-main.cpp(147): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
-main.cpp(151): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
-main.cpp(155): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
-main.cpp(159): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(211): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(215): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(219): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(223): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(233): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(237): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(241): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(245): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(256): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(260): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(264): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(268): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(278): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(282): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(286): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(290): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(299): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(303): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(307): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(311): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(320): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(324): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(328): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(332): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(341): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(345): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(349): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(353): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(361): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(365): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(369): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(373): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(381): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(385): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(389): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
+main.cpp(393): warning C4244: 'argument': conversion from 'int' to 'irr::f32', possible loss of data
   Generating code
-  0 of 194 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
+  2 of 195 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   calm_down.vcxproj -> C:\Users\Alexa\Desktop\terrain2\calm_down_terrain\Release\calm_down.exe

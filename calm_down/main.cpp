@@ -130,56 +130,372 @@ int main()
 	int size = side_size / pol_width;
 	int vertexes = 12;
 
-	SMesh* mesh = new SMesh();
-	SMeshBuffer *mesh_buffer = new SMeshBuffer();
-	mesh->addMeshBuffer(mesh_buffer);
-	mesh_buffer->drop();
+	SMesh* mesh0 = new SMesh();
+	SMeshBuffer *mesh_buffer0 = new SMeshBuffer();
+	mesh0->addMeshBuffer(mesh_buffer0);
+	mesh_buffer0->drop();
 
-	mesh_buffer->Vertices.reallocate(size*size*vertexes); //allocate space for vertices
-	mesh_buffer->Vertices.set_used(size*size*vertexes);   //now you can access indices 0..20*20*6
+	SMesh* mesh1 = new SMesh();
+	SMeshBuffer *mesh_buffer1 = new SMeshBuffer();
+	mesh1->addMeshBuffer(mesh_buffer1);
+	mesh_buffer1->drop();
+
+	SMesh* mesh2 = new SMesh();
+	SMeshBuffer *mesh_buffer2 = new SMeshBuffer();
+	mesh2->addMeshBuffer(mesh_buffer2);
+	mesh_buffer2->drop();
+
+	SMesh* mesh3 = new SMesh();
+	SMeshBuffer *mesh_buffer3 = new SMeshBuffer();
+	mesh3->addMeshBuffer(mesh_buffer3);
+	mesh_buffer3->drop();
+
+	SMesh* mesh4 = new SMesh();
+	SMeshBuffer *mesh_buffer4 = new SMeshBuffer();
+	mesh4->addMeshBuffer(mesh_buffer4);
+	mesh_buffer4->drop();
+
+	SMesh* mesh5 = new SMesh();
+	SMeshBuffer *mesh_buffer5 = new SMeshBuffer();
+	mesh5->addMeshBuffer(mesh_buffer5);
+	mesh_buffer5->drop();
+
+	SMesh* mesh6 = new SMesh();
+	SMeshBuffer *mesh_buffer6 = new SMeshBuffer();
+	mesh6->addMeshBuffer(mesh_buffer6);
+	mesh_buffer6->drop();
+
+	SMesh* mesh7 = new SMesh();
+	SMeshBuffer *mesh_buffer7 = new SMeshBuffer();
+	mesh7->addMeshBuffer(mesh_buffer7);
+	mesh_buffer7->drop();
+
+	SMesh* mesh8 = new SMesh();
+	SMeshBuffer *mesh_buffer8 = new SMeshBuffer();
+	mesh8->addMeshBuffer(mesh_buffer8);
+	mesh_buffer8->drop();
+
+	mesh_buffer0->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer0->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer1->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer1->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer2->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer2->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer3->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer3->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer4->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer4->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer5->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer5->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer6->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer6->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer7->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer7->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
+
+	mesh_buffer8->Vertices.reallocate(vertexes); //allocate space for vertices
+	mesh_buffer8->Vertices.set_used(vertexes);   //now you can access indices 0..20*20*6
 
 	int vert_count = 0;
 	float delta = 10;
-	for (int x = 0; x < size; x++) {//size		
-		for (int y = 0; y < size; y++) {//size
-			mesh_buffer->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+	for (int x = 0; x < 1; x++) {//size		
+		for (int y = 0; y < 1; y++) {//size
+			mesh_buffer0->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-			mesh_buffer->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
-			mesh_buffer->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer0->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-			mesh_buffer->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-			mesh_buffer->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer0->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
 
-			vert_count += 12;
+			//vert_count += 12;
 		}
 	}
 
-	mesh_buffer->Indices.reallocate(size*size*vertexes);  //allocate space for indices
-	mesh_buffer->Indices.set_used(size*size*vertexes);
-	for (int i = 0; i < size * size * vertexes; ++i) {
-		mesh_buffer->Indices[i] = i;
+	for (int x = 0; x < 1; x++) {//size		
+		for (int y = 1; y < 2; y++) {//size
+			mesh_buffer1->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer1->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer1->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer1->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer1->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer1->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			//vert_count += 12;
+		}
 	}
 
-	mesh_buffer->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
-	IMeshSceneNode* myNode = smgr->addMeshSceneNode(mesh);
-	myNode->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
-	myNode->setMaterialFlag(EMF_LIGHTING, false);
-	//myNode->setMaterialFlag(video::EMF_WIREFRAME, true);
-	myNode->setPosition(vector3df(0, 0, 0));
+
+	for (int x = 0; x < 1; x++) {//size		
+		for (int y = 2; y < 3; y++) {//size
+			mesh_buffer4->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer4->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer4->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer4->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer4->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer4->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			//vert_count += 12;
+		}
+	}
+
+	for (int x = 1; x < 2; x++) {//size		
+		for (int y = 0; y < 1; y++) {//size
+			mesh_buffer2->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer2->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer2->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer2->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer2->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer2->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+		}
+	}
+
+	for (int x = 1; x < 2; x++) {//size		
+		for (int y = 1; y < 2; y++) {//size
+			mesh_buffer3->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer3->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer3->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer3->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer3->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer3->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+		}
+	}
+
+	for (int x = 1; x < 2; x++) {//size		
+		for (int y = 2; y < 3; y++) {//size
+			mesh_buffer5->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer5->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer5->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer5->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer5->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer5->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+		}
+	}
+
+	for (int x = 2; x < 3; x++) {//size		
+		for (int y = 0; y < 1; y++) {//size
+			mesh_buffer6->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer6->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer6->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer6->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer6->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer6->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+		}
+	}
+
+	for (int x = 2; x < 3; x++) {//size		
+		for (int y = 1; y < 2; y++) {//size
+			mesh_buffer7->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer7->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer7->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer7->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer7->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer7->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+		}
+	}
+
+	for (int x = 2; x < 3; x++) {//size		
+		for (int y = 2; y < 3; y++) {//size
+			mesh_buffer8->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer8->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
+			mesh_buffer8->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer8->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+
+			mesh_buffer8->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+			mesh_buffer8->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+		}
+	}
+
+
+	mesh_buffer0->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer0->Indices.set_used(vertexes);
+
+	mesh_buffer1->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer1->Indices.set_used(vertexes);
+
+	mesh_buffer2->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer2->Indices.set_used(vertexes);
+
+	mesh_buffer3->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer3->Indices.set_used(vertexes);
+
+	mesh_buffer4->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer4->Indices.set_used(vertexes);
+
+	mesh_buffer5->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer5->Indices.set_used(vertexes);
+
+	mesh_buffer6->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer6->Indices.set_used(vertexes);
+
+	mesh_buffer7->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer7->Indices.set_used(vertexes);
+
+	mesh_buffer8->Indices.reallocate(vertexes);  //allocate space for indices
+	mesh_buffer8->Indices.set_used(vertexes);
+
+	for (int i = 0; i < vertexes; ++i) {
+		mesh_buffer0->Indices[i] = i;
+		mesh_buffer1->Indices[i] = i;
+		mesh_buffer2->Indices[i] = i;
+		mesh_buffer3->Indices[i] = i;
+		mesh_buffer4->Indices[i] = i;
+		mesh_buffer5->Indices[i] = i;
+		mesh_buffer6->Indices[i] = i;
+		mesh_buffer7->Indices[i] = i;
+		mesh_buffer8->Indices[i] = i;
+	}
+
+	mesh_buffer0->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer1->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer2->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer3->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer4->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer5->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer6->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer7->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+	mesh_buffer8->recalculateBoundingBox(); //Recalculate the bounding box. should be called if the mesh changed.
+
+	IMeshSceneNode* myNode0 = smgr->addMeshSceneNode(mesh0);
+	myNode0->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode0->setMaterialFlag(EMF_LIGHTING, false);
+	myNode0->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode1 = smgr->addMeshSceneNode(mesh1);
+	myNode1->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode1->setMaterialFlag(EMF_LIGHTING, false);
+	myNode1->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode2 = smgr->addMeshSceneNode(mesh2);
+	myNode2->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode2->setMaterialFlag(EMF_LIGHTING, false);
+	myNode2->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode3 = smgr->addMeshSceneNode(mesh3);
+	myNode3->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode3->setMaterialFlag(EMF_LIGHTING, false);
+	myNode3->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode4 = smgr->addMeshSceneNode(mesh4);
+	myNode4->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode4->setMaterialFlag(EMF_LIGHTING, false);
+	myNode4->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode5 = smgr->addMeshSceneNode(mesh5);
+	myNode5->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode5->setMaterialFlag(EMF_LIGHTING, false);
+	myNode5->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode6 = smgr->addMeshSceneNode(mesh6);
+	myNode6->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode6->setMaterialFlag(EMF_LIGHTING, false);
+	myNode6->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode7 = smgr->addMeshSceneNode(mesh7);
+	myNode7->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode7->setMaterialFlag(EMF_LIGHTING, false);
+	myNode7->setPosition(vector3df(0, 0, 0));
+
+	IMeshSceneNode* myNode8 = smgr->addMeshSceneNode(mesh8);
+
+	myNode8->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
+	myNode8->setMaterialFlag(EMF_LIGHTING, false);
+	myNode8->setPosition(vector3df(0, 0, 0));
+	myNode8->setAutomaticCulling(EAC_FRUSTUM_SPHERE);
 
 
 	ICameraSceneNode* camera = 0;
 	//camera = smgr->addCameraSceneNodeFPS(0, 75.0f, 1.0f, -1, keyMap, 8);
 	camera = smgr->addCameraSceneNodeFPS();
-	camera->setPosition(vector3df(500.0f, 200.0f, 500.0f));
+	camera->setPosition(vector3df(300.0f, 200.0f, 300.0f));
 	//camera->setTarget(vector3df(0.0f, 0.0f, 100.0f));
 	camera->setFarValue(20000.f);//20000
 	camera->setNearValue(1.0f);
