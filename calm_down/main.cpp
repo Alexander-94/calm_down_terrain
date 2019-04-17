@@ -14,6 +14,7 @@ nearly all other tutorials:
 */
 #include <irrlicht.h>
 #include <iostream>
+#include <random>
 #include "driverChoice.h"
 
 using namespace irr;
@@ -47,7 +48,7 @@ using namespace video;
 using namespace io;
 using namespace gui;
 using namespace std;
-
+#include <random>
 #define SPEED 10
 extern bool fullscreen = false;
 
@@ -93,6 +94,26 @@ irr::s32 framelimit = 60,
 irr::u32 sceneStartTime = 0,
 		 sceneSkipTime = 1000 / framelimit;
 
+
+irr::core::vector3df vector_combine(irr::core::vector3df v1, irr::core::vector3df v2, float f1, float f2) {
+	irr::core::vector3df result;
+	result.X = f1 * v1.X + f2 * v2.X;
+	result.Y = f1 * v1.Y + f2 * v2.Y;
+	result.Z = f1 * v1.Z + f2 * v2.Z;
+	return result;
+}
+
+struct tile {
+	irr::core::vector3df vertm1;
+	int left_up_z;
+	int right_up_z;
+	int left_down_z;
+	int right_down_z;
+	int center_z;
+
+	irr::video::SColor color;
+};
+
 int main()
 {
 	//The event receiver for keeping the pressed keys is ready, the actual responses will be made inside the render loop, right before drawing the scene.
@@ -125,10 +146,10 @@ int main()
 	keyMap[7].Action = EKA_STRAFE_RIGHT;
 	keyMap[7].KeyCode = KEY_KEY_D;
 
-	int side_size = 1000;//0;
-	int pol_width = 200;
-	int size = side_size / pol_width;
-	int vertexes = 12;
+	//int side_size = 10000;
+	int pol_width = 150;     //tile width
+	const int size = 70;     //N of tiles
+	const int vertexes = 12;
 
 	SMesh* mesh = new SMesh();
 	SMeshBuffer *mesh_buffer = new SMeshBuffer();
@@ -137,30 +158,110 @@ int main()
 
 	mesh_buffer->Vertices.reallocate(size*size*vertexes); //allocate space for vertices
 	mesh_buffer->Vertices.set_used(size*size*vertexes);   //now you can access indices 0..20*20*6
+	
+	//generate rnd height of Z axis
+	std::random_device g;
+	std::mt19937 rng(g());
+	std::uniform_int_distribution<std::mt19937::result_type> generate(-100.0, 100);
 
+	struct tile tiles[size][size];  //producing the 2dimension (XYZ + SColor) structure, so that we can store the values
 	int vert_count = 0;
-	float delta = 10;
-	for (int x = 0; x < size; x++) {//size		
-		for (int y = 0; y < size; y++) {//size
-			mesh_buffer->Vertices[vert_count] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 1] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 2] = S3DVertex(x*pol_width + pol_width / 2 - delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+	irr::f32 delta = 2.0f;
 
-			mesh_buffer->Vertices[vert_count + 3] = S3DVertex(x*pol_width + delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 4] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 150);
-			mesh_buffer->Vertices[vert_count + 5] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+	int center_z = 0;
+	int left_up_z = 0;
+	int right_up_z = 0;
+	int left_down_z = 0;
+	int right_down_z = 0;
 
-			mesh_buffer->Vertices[vert_count + 6] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + pol_width - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 7] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 8] = S3DVertex(x*pol_width + pol_width / 2 + delta, 0, y*pol_width + pol_width / 2, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
+	//random generating of height of squares
+	for (int x = 0; x < size; x++) {
+		for (int y = 0; y < size; y++) {
 
-			mesh_buffer->Vertices[vert_count + 9] = S3DVertex(x*pol_width + pol_width - delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 10] = S3DVertex(x*pol_width + delta, 0, y*pol_width + delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-			mesh_buffer->Vertices[vert_count + 11] = S3DVertex(x*pol_width + pol_width / 2, 0, y*pol_width + pol_width / 2 - delta, 0, 0, 0, video::SColor(255, 0, 0, 0), 0, 0);
-
-			vert_count += 12;
+			if (x == 0 && y == 0) { //generate all 4 corners - first square of first row
+				tiles[x][y].left_up_z = generate(rng);
+				tiles[x][y].right_up_z = generate(rng);
+				tiles[x][y].left_down_z = generate(rng);
+				tiles[x][y].right_down_z = generate(rng);			
+			}
+			else if (x == 0 && y > 0) { //generate 2 right corners, take 2 left corners from prev square - other squares of first row
+				tiles[x][y].left_up_z = tiles[x][y - 1].right_up_z;
+				tiles[x][y].right_up_z = generate(rng);
+				tiles[x][y].left_down_z = tiles[x][y - 1].right_down_z;
+				tiles[x][y].right_down_z = generate(rng);
+			}
+			else if (x > 0 && y == 0) { // take two up corners from first line first square - first square of N row
+				tiles[x][y].left_up_z = tiles[x-1][y].left_down_z;
+				tiles[x][y].right_up_z = tiles[x-1][y].right_down_z;
+				tiles[x][y].left_down_z = generate(rng);
+				tiles[x][y].right_down_z = generate(rng);
+			}
+			else if (x > 0 && y > 0){ // take three corners from prev squares - other squares of N rows
+				tiles[x][y].left_up_z = tiles[x][y-1].right_up_z;
+				tiles[x][y].right_up_z = tiles[x-1][y].right_down_z;
+				tiles[x][y].left_down_z = tiles[x][y-1].right_down_z;
+				tiles[x][y].right_down_z = generate(rng);
+			}
+		    							
+			tiles[x][y].center_z = generate(rng);
 		}
 	}
+
+	for (int x = 0; x < size; x++) {     //size  2
+		for (int y = 0; y < size; y++) { //size  5
+
+			int pick_color = generate(rng);
+			if (pick_color < -50) {
+				tiles[x][y].color = irr::video::SColor(100, 2, 100, 248);
+			} 
+			else if(pick_color < 0) {
+				tiles[x][y].color = irr::video::SColor(255, 2, 100, 144);
+			} 
+			else if (pick_color < 50) {
+				tiles[x][y].color = irr::video::SColor(100, 2, 157, 144);
+			}
+			else if (pick_color < 100) {
+				tiles[x][y].color = irr::video::SColor(100, 2, 101, 49);
+			}
+						
+			tiles[x][y].vertm1.X = x*pol_width;
+			tiles[x][y].vertm1.Y = y*pol_width;								    
+			//                                                                                                Z
+			mesh_buffer->Vertices[vert_count] =      S3DVertex(tiles[x][y].vertm1.X + delta,                  tiles[x][y].left_up_z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);             //*1 по х проход
+			mesh_buffer->Vertices[vert_count + 1] =  S3DVertex(tiles[x][y].vertm1.X + delta,                  tiles[x][y].right_up_z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0); //*1 по х проход
+			mesh_buffer->Vertices[vert_count + 2] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2 - delta,  tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2, 0, 0, 0, tiles[x][y].color, 0, 0);                //center *1 по х проход
+
+			mesh_buffer->Vertices[vert_count + 3] =  S3DVertex(tiles[x][y].vertm1.X + delta,                  tiles[x][y].right_up_z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0);                  //*1 по х проход
+			mesh_buffer->Vertices[vert_count + 4] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      tiles[x][y].right_down_z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0);                  //*новый y проход, у++
+			mesh_buffer->Vertices[vert_count + 5] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2,          tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2 + delta, 0, 0, 0, tiles[x][y].color, 0, 0);        //center *1 по х проход
+
+			mesh_buffer->Vertices[vert_count + 6] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      tiles[x][y].right_down_z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0);                  //*новый y проход, у++
+			mesh_buffer->Vertices[vert_count + 7] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      tiles[x][y].left_down_z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);                              //*новый y проход, у++
+			mesh_buffer->Vertices[vert_count + 8] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2 + delta,  tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2, 0, 0, 0, tiles[x][y].color, 0, 0);                //center *1 по х проход
+
+			mesh_buffer->Vertices[vert_count + 9] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      tiles[x][y].left_down_z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);                              //*новый y проход, у++
+			mesh_buffer->Vertices[vert_count + 10] = S3DVertex(tiles[x][y].vertm1.X + delta,                  tiles[x][y].left_up_z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);                              //*1 по х проход
+			mesh_buffer->Vertices[vert_count + 11] = S3DVertex(tiles[x][y].vertm1.X + pol_width / 2,          tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2 - delta, 0, 0, 0, tiles[x][y].color, 0, 0);        //center *1 по х проход
+
+			vert_count += 12;			
+		}		
+	}
+	
+	irr::core::vector3df v1;
+	v1.X = 0;
+	v1.Z = 0;
+    v1.Y = 0;
+	printf("\nV1--X:%f Y:%f Z:%f", v1.X, v1.Z, v1.Y);
+	irr::core::vector3df v2;
+	v2.X = 0;
+	v2.Z = 10;
+	v2.Y = 0;
+	printf("\nV2--X:%f Y:%f Z:%f", v2.X, v2.Z, v2.Y);
+
+	irr::f32 gap = 5.0f;
+	irr::core::vector3df temp = vector_combine(v1, v2, gap, gap);
+
+	printf("\nVcomb--X:%f Y:%f Z:%f", temp.X, temp.Z, temp.Y);
 
 	mesh_buffer->Indices.reallocate(size*size*vertexes);  //allocate space for indices
 	mesh_buffer->Indices.set_used(size*size*vertexes);
@@ -172,24 +273,18 @@ int main()
 	IMeshSceneNode* myNode = smgr->addMeshSceneNode(mesh);
 	myNode->setMaterialFlag(video::EMF_BACK_FACE_CULLING, false);  //render backside of the mesh
 	myNode->setMaterialFlag(EMF_LIGHTING, false);
+	myNode->setAutomaticCulling(EAC_FRUSTUM_SPHERE);
 	//myNode->setMaterialFlag(video::EMF_WIREFRAME, true);
 	myNode->setPosition(vector3df(0, 0, 0));
 
 
 	ICameraSceneNode* camera = 0;
-	//camera = smgr->addCameraSceneNodeFPS(0, 75.0f, 1.0f, -1, keyMap, 8);
-	camera = smgr->addCameraSceneNodeFPS();
-	camera->setPosition(vector3df(500.0f, 200.0f, 500.0f));
+	camera = smgr->addCameraSceneNodeFPS(0, 75.0f, 1.0f, -1, keyMap, 8);
+	camera->setPosition(vector3df(5000.0f, 500.0f, 5000.0f));
 	//camera->setTarget(vector3df(0.0f, 0.0f, 100.0f));
 	camera->setFarValue(20000.f);//20000
 	camera->setNearValue(1.0f);
-	//
-
-	
-	
-	irr::f32 a = camera->getFOV();
-	printf("\n--%f--\n", a); //1.2566
-
+			
 	//The game cycle:
 	//We run the device in a while() loop, until the device does not want to run any more. 
 	//This would be when the user closes the window
