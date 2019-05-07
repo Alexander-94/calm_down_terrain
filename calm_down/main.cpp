@@ -16,6 +16,8 @@ nearly all other tutorials:
 #include <iostream>
 #include <random>
 #include "driverChoice.h"
+#include <vector>
+#include <algorithm>
 
 using namespace irr;
 
@@ -151,7 +153,7 @@ int main()
 	keyMap[7].KeyCode = KEY_KEY_D;
 
 	//int side_size = 10000;
-	int pol_width = 150;     //tile width
+	int pol_width = 150;     //tile width //150
 	const int size = 70;     //N of tiles
 	const int vertexes = 12;
 
@@ -166,7 +168,7 @@ int main()
 	//generate rnd height of Z axis
 	std::random_device g;
 	std::mt19937 rng(g());
-	std::uniform_int_distribution<std::mt19937::result_type> generate(-100.0, 100);
+	std::uniform_int_distribution<std::mt19937::result_type> generate(-110, 110); //-100,100
 
 	struct node nodes[size][size];  // for Z verts noise generating
 	struct tile tiles[size][size];  // producing the 2dimension (XYZ + SColor) structure, so that we can store the values
@@ -179,52 +181,52 @@ int main()
 	int right_up_z = 0;
 	int left_down_z = 0;
 	int right_down_z = 0;
-	int tempz = 0;
+	int tmp_z = 0;
+	float tmp_center_z = 0;
+
+	// generation of Z-noise for squares vertexes (without center)
 	for (int x = 0; x < size; x++) {
 		for (int y = 0; y < size; y++) {
-			tempz = generate(rng);
-			nodes[x][y].vert = irr::core::vector3df(0, 0, (float)tempz);
-			printf("X:[%f], Y:[%f], Z:[%f]\n", ((float)x - (float)size / 2.0f), ((float)y - (float)size / 2.0f), nodes[x][y].vert.Z);
+			tmp_z = generate(rng);
+			nodes[x][y].vert = irr::core::vector3df(0, 0, (float)tmp_z);
+			//printf("Z:[%f]\n", (float)nodes[x][y].vert.Z);
 		}
 	}
-	/*	//random generating of height of squares
-	for (int x = 0; x < size; x++) {
-		for (int y = 0; y < size; y++) {
+	//int test = 0;
+	// generation of Z-noise for squares centers
+	for (int x = 0; x < size-1; x++) {
+		for (int y = 0; y < size-1; y++) {
+			int avg = 0;
+			tmp_center_z = 0;
 
-			if (x == 0 && y == 0) { //generate all 4 corners - first square of first row
-				tiles[x][y].left_up_z = generate(rng);
-				tiles[x][y].right_up_z = generate(rng);
-				tiles[x][y].left_down_z = generate(rng);
-				tiles[x][y].right_down_z = generate(rng);			
-			}
-			else if (x == 0 && y > 0) { //generate 2 right corners, take 2 left corners from prev square - other squares of first row
-				tiles[x][y].left_up_z = tiles[x][y - 1].right_up_z;
-				tiles[x][y].right_up_z = generate(rng);
-				tiles[x][y].left_down_z = tiles[x][y - 1].right_down_z;
-				tiles[x][y].right_down_z = generate(rng);
-			}
-			else if (x > 0 && y == 0) { // take two up corners from first line first square - first square of N row
-				tiles[x][y].left_up_z = tiles[x-1][y].left_down_z;
-				tiles[x][y].right_up_z = tiles[x-1][y].right_down_z;
-				tiles[x][y].left_down_z = generate(rng);
-				tiles[x][y].right_down_z = generate(rng);
-			}
-			else if (x > 0 && y > 0){ // take three corners from prev squares - other squares of N rows
-				tiles[x][y].left_up_z = tiles[x][y-1].right_up_z;
-				tiles[x][y].right_up_z = tiles[x-1][y].right_down_z;
-				tiles[x][y].left_down_z = tiles[x][y-1].right_down_z;
-				tiles[x][y].right_down_z = generate(rng);
-			}
-		    							
-			tiles[x][y].center_z = generate(rng);
+			tmp_center_z += nodes[x][y].vert.Z;
+			avg++;
+			tmp_center_z += nodes[x][y+1].vert.Z;
+			avg++;
+			tmp_center_z += nodes[x+1][y+1].vert.Z;
+			avg++;
+			tmp_center_z += nodes[x+1][y].vert.Z;
+			avg++;
+			tmp_center_z = tmp_center_z / (float)avg;
+			nodes[x][y].vert.Y = tmp_center_z; // высоты центров, выровняные по смежным не центральным высотам
 		}
-	}*/
+	}
+
+	// smoothing
+	for (int x = 1; x < size-1; x++) {
+		for (int y = 1; y < size-1; y++) {
+			nodes[x][y].vert.Z = (nodes[x][y - 1].vert.Z + nodes[x + 1][y].vert.Z + nodes[x][y + 1].vert.Z + nodes[x - 1][y].vert.Z) / 4;
+		}
+	}
+
 	irr::f32 temp_cornrs[size][size] = {0};
 	irr::f32 temp_center[size][size] = {0};
-
-	for (int x = 0; x < size-1; x++) {     //size  2
-		for (int y = 0; y < size-1; y++) { //size  5			
+	//nodes[x][y].vert.Y - высоты центров
+	//nodes[x][y].vert.Z - остальные высоты
+	for (int x = 0; x < size-1; x++) {
+		for (int y = 0; y < size-1; y++) {
 			int pick_color = generate(rng);
+
 			if (pick_color < -50) {
 				tiles[x][y].color = irr::video::SColor(100, 2, 100, 248);
 			} 
@@ -237,26 +239,29 @@ int main()
 			else if (pick_color < 100) {
 				tiles[x][y].color = irr::video::SColor(100, 2, 101, 49);
 			}
-						
+			else
+			{
+				tiles[x][y].color = irr::video::SColor(50, 255, 255, 255);
+			}
 
 			tiles[x][y].vertm1.X = x*pol_width;
 			tiles[x][y].vertm1.Y = y*pol_width;								    
 			//                                                                                                Z
 			mesh_buffer->Vertices[vert_count] =      S3DVertex(tiles[x][y].vertm1.X + delta,                  nodes[x][y].vert.Z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);             //*1 по х проход
 			mesh_buffer->Vertices[vert_count + 1] =  S3DVertex(tiles[x][y].vertm1.X + delta,                  nodes[x][y+1].vert.Z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0); //*1 по х проход
-			mesh_buffer->Vertices[vert_count + 2] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2 - delta,  tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2, 0, 0, 0, tiles[x][y].color, 0, 0);                //center *1 по х проход
+			mesh_buffer->Vertices[vert_count + 2] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2 - delta,  nodes[x][y].vert.Y, tiles[x][y].vertm1.Y + pol_width / 2, 0, 0, 0, tiles[x][y].color, 0, 0);                //center *1 по х проход
 
 			mesh_buffer->Vertices[vert_count + 3] =  S3DVertex(tiles[x][y].vertm1.X + delta,                  nodes[x][y+1].vert.Z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0);                  //*1 по х проход
 			mesh_buffer->Vertices[vert_count + 4] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      nodes[x+1][y+1].vert.Z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0);                  //*новый y проход, у++
-			mesh_buffer->Vertices[vert_count + 5] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2,          tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2 + delta, 0, 0, 0, tiles[x][y].color, 0, 0);        //center *1 по х проход
+			mesh_buffer->Vertices[vert_count + 5] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2,          nodes[x][y].vert.Y, tiles[x][y].vertm1.Y + pol_width / 2 + delta, 0, 0, 0, tiles[x][y].color, 0, 0);        //center *1 по х проход
 
 			mesh_buffer->Vertices[vert_count + 6] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      nodes[x+1][y+1].vert.Z, tiles[x][y].vertm1.Y + pol_width - delta, 0, 0, 0, tiles[x][y].color, 0, 0);                  //*новый y проход, у++
 			mesh_buffer->Vertices[vert_count + 7] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      nodes[x+1][y].vert.Z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);                              //*новый y проход, у++
-			mesh_buffer->Vertices[vert_count + 8] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2 + delta,  tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2, 0, 0, 0, tiles[x][y].color, 0, 0);                //center *1 по х проход
+			mesh_buffer->Vertices[vert_count + 8] =  S3DVertex(tiles[x][y].vertm1.X + pol_width / 2 + delta,  nodes[x][y].vert.Y, tiles[x][y].vertm1.Y + pol_width / 2, 0, 0, 0, tiles[x][y].color, 0, 0);                //center *1 по х проход
 
 			mesh_buffer->Vertices[vert_count + 9] =  S3DVertex(tiles[x][y].vertm1.X + pol_width - delta,      nodes[x+1][y].vert.Z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);                              //*новый y проход, у++
 			mesh_buffer->Vertices[vert_count + 10] = S3DVertex(tiles[x][y].vertm1.X + delta,                  nodes[x][y].vert.Z, tiles[x][y].vertm1.Y + delta, 0, 0, 0, tiles[x][y].color, 0, 0);                              //*1 по х проход
-			mesh_buffer->Vertices[vert_count + 11] = S3DVertex(tiles[x][y].vertm1.X + pol_width / 2,          tiles[x][y].center_z, tiles[x][y].vertm1.Y + pol_width / 2 - delta, 0, 0, 0, tiles[x][y].color, 0, 0);        //center *1 по х проход
+			mesh_buffer->Vertices[vert_count + 11] = S3DVertex(tiles[x][y].vertm1.X + pol_width / 2,          nodes[x][y].vert.Y, tiles[x][y].vertm1.Y + pol_width / 2 - delta, 0, 0, 0, tiles[x][y].color, 0, 0);        //center *1 по х проход
 
 			vert_count += 12;			
 		}		
